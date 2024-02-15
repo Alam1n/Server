@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
+import json
 from flask_cors import CORS
 from ListGenration import get_feedstuff_for_hardcoded_animal
-from Cattle_Ration_Calculator import calculate_nutritional_requirements
+from Ration_Calculator import calculate_nutritional_requirements
 
 app = Flask(__name__)
 CORS(app,  origins='http://localhost:5173') # Enable CORS for all routes
@@ -18,14 +19,17 @@ def calculate_feed():
     stage = str(data['purpose'])
 
     # Get the suitable feedstuff for the chosen animal type
-    feedstuff_info = calculate_nutritional_requirements(animal_type.lower(), stage.lower())
+    nutritional_values = calculate_nutritional_requirements(animal_type.lower(), stage.lower())
+    feed_list = get_feedstuff_for_hardcoded_animal(animal_type)
 
-    if feedstuff_info:
+
+    if nutritional_values and not feed_list.empty:
         # Prepare the response
         response = {
-            "totalProtein": feedstuff_info.get('Estimated_Protein', 0),
-            "totalEnergy": feedstuff_info.get('Estimated_Energy', 0),
-            "totalFiber": feedstuff_info.get('Estimated_Fiber', 0)
+            "totalProtein": nutritional_values.get('Estimated_Protein', 0),
+            "totalEnergy": nutritional_values.get('Estimated_Energy', 0),
+            "totalFiber": nutritional_values.get('Estimated_Fiber', 0),
+            "FEEDSTUFF": feed_list.to_string(index=False)
         }
 
         return jsonify(response), 200
