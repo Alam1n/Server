@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-import json
 from flask_cors import CORS
 from ListGenration import get_feedstuff_for_hardcoded_animal
 from Cattle_Ration_Calculator import calculate_nutritional_requirements
